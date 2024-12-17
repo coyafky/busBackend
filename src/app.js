@@ -77,13 +77,6 @@ app.get('/', (req, res) => {
   });
 });
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/routes', routeRoutes);
-app.use('/api/bookings', bookingRoutes);
-app.use('/api/cities', cityRoutes);
-
 // 添加测试路由
 app.get('/api/test', (req, res) => {
   res.json({
@@ -91,6 +84,21 @@ app.get('/api/test', (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// 添加认证测试路由
+app.get('/api/auth/test', (req, res) => {
+  res.json({
+    message: 'Auth route is working!',
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/routes', routeRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/cities', cityRoutes);
 
 // 404处理
 app.use((req, res, next) => {
