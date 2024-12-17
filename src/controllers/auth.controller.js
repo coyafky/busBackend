@@ -131,11 +131,9 @@ exports.login = async (req, res) => {
 // 获取当前用户信息
 exports.getCurrentUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id).select('-password');
     if (!user) {
-      return res.status(404).json({
-        message: '用户不存在',
-      });
+      return res.status(404).json({ message: '用户不存在' });
     }
 
     res.json({
@@ -143,7 +141,7 @@ exports.getCurrentUser = async (req, res) => {
       data: {
         user: {
           id: user._id,
-          userId: user._id,
+          userId: user.userId,
           username: user.username,
           email: user.email,
           phoneNumber: user.phoneNumber,
@@ -154,16 +152,14 @@ exports.getCurrentUser = async (req, res) => {
     });
   } catch (error) {
     console.error('获取用户信息错误:', error);
-    res.status(500).json({
-      message: '获取用户信息失败',
-    });
+    res.status(500).json({ message: '获取用户信息时发生错误' });
   }
 };
 
-// 更新用户资料
-exports.updateProfile = async (req, res) => {
+// 更新当前用户信息
+exports.updateCurrentUser = async (req, res) => {
   try {
-    const { email, phoneNumber, nickname } = req.body;
+    const { email, phoneNumber, profile, preferences } = req.body;
     const userId = req.user._id;
 
     // 查找用户
@@ -172,10 +168,39 @@ exports.updateProfile = async (req, res) => {
       return res.status(404).json({ message: '用户不存在' });
     }
 
-    // 更新用户资料
-    if (email) user.email = email;
-    if (phoneNumber) user.phoneNumber = phoneNumber;
-    if (nickname) user.profile.nickname = nickname;
+    // 验证邮箱唯一性
+    if (email && email !== user.email) {
+      const existingEmail = await User.findOne({ email });
+      if (existingEmail) {
+        return res.status(400).json({ message: '该邮箱已被使用' });
+      }
+      user.email = email;
+    }
+
+    // 验证手机号唯一性
+    if (phoneNumber && phoneNumber !== user.phoneNumber) {
+      const existingPhone = await User.findOne({ phoneNumber });
+      if (existingPhone) {
+        return res.status(400).json({ message: '该手机号已被使用' });
+      }
+      user.phoneNumber = phoneNumber;
+    }
+
+    // 更新个人资料
+    if (profile) {
+      user.profile = {
+        ...user.profile,
+        ...profile,
+      };
+    }
+
+    // 更新偏好设置
+    if (preferences) {
+      user.preferences = {
+        ...user.preferences,
+        ...preferences,
+      };
+    }
 
     // 保存更改
     await user.save();
@@ -191,12 +216,13 @@ exports.updateProfile = async (req, res) => {
           email: user.email,
           phoneNumber: user.phoneNumber,
           profile: user.profile,
+          preferences: user.preferences,
         },
       },
     });
   } catch (error) {
-    console.error('更新个人信息错误:', error);
-    res.status(500).json({ message: '更新个人信息时发生错误' });
+    console.error('更新用户信息错误:', error);
+    res.status(500).json({ message: '更新用户信息时发生错误' });
   }
 };
 
@@ -205,5 +231,5 @@ module.exports = {
   register: exports.register,
   login: exports.login,
   getCurrentUser: exports.getCurrentUser,
-  updateProfile: exports.updateProfile,
+  updateCurrentUser: exports.updateCurrentUser,
 };

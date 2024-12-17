@@ -34,8 +34,8 @@ router.post('/login', (req, res, next) => {
 // 获取当前用户信息（需要认证）
 router.get('/me', verifyToken, authController.getCurrentUser);
 
-// 更新个人信息（需要认证）
-router.put('/profile', verifyToken, authController.updateProfile);
+// 更新当前用户信息（需要认证）
+router.put('/me', verifyToken, authController.updateCurrentUser);
 
 // 导出路由器之前打印所有注册的路由
 console.log('Registered auth routes:', 
