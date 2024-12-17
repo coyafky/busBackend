@@ -199,18 +199,67 @@ exports.updateCurrentUser = async (req, res) => {
 
     // 更新个人资料
     if (profile) {
-      user.profile = {
-        ...user.profile,
-        ...profile,
-      };
+      // 只更新提供的字段
+      Object.keys(profile).forEach(key => {
+        if (profile[key] !== undefined) {
+          user.profile[key] = profile[key];
+        }
+      });
     }
 
     // 更新偏好设置
     if (preferences) {
-      user.preferences = {
-        ...user.preferences,
-        ...preferences,
-      };
+      // 确保 preferences 对象存在
+      user.preferences = user.preferences || {};
+      
+      // 只更新提供的字段
+      if (preferences.language !== undefined) {
+        user.preferences.language = preferences.language;
+      }
+      if (preferences.currency !== undefined) {
+        user.preferences.currency = preferences.currency;
+      }
+      if (preferences.timezone !== undefined) {
+        user.preferences.timezone = preferences.timezone;
+      }
+      
+      // 更新价格范围
+      if (preferences.priceRange) {
+        user.preferences.priceRange = user.preferences.priceRange || {};
+        if (preferences.priceRange.min !== undefined) {
+          user.preferences.priceRange.min = preferences.priceRange.min;
+        }
+        if (preferences.priceRange.max !== undefined) {
+          user.preferences.priceRange.max = preferences.priceRange.max;
+        }
+      }
+      
+      // 更新首选功能
+      if (preferences.preferredFeatures) {
+        user.preferences.preferredFeatures = user.preferences.preferredFeatures || {};
+        if (preferences.preferredFeatures.wifi !== undefined) {
+          user.preferences.preferredFeatures.wifi = preferences.preferredFeatures.wifi;
+        }
+        if (preferences.preferredFeatures.toilet !== undefined) {
+          user.preferences.preferredFeatures.toilet = preferences.preferredFeatures.toilet;
+        }
+        if (preferences.preferredFeatures.usbCharger !== undefined) {
+          user.preferences.preferredFeatures.usbCharger = preferences.preferredFeatures.usbCharger;
+        }
+        if (preferences.preferredFeatures.airConditioner !== undefined) {
+          user.preferences.preferredFeatures.airConditioner = preferences.preferredFeatures.airConditioner;
+        }
+      }
+      
+      // 更新首选巴士类型
+      if (Array.isArray(preferences.preferredBusTypes)) {
+        user.preferences.preferredBusTypes = preferences.preferredBusTypes;
+      }
+      
+      // 更新首选出发时间
+      if (Array.isArray(preferences.preferredDepartureTime)) {
+        user.preferences.preferredDepartureTime = preferences.preferredDepartureTime;
+      }
     }
 
     // 保存更改
