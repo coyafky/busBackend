@@ -89,25 +89,30 @@ const connectWithRetry = async () => {
 
   while (currentRetry < maxRetries) {
     try {
-      await mongoose.connect(
-        process.env.MONGODB_URI || 'mongodb://localhost:27017/BBbus',
-        {
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-        }
-      );
+      const mongoUri = process.env.MONGODB_URI;
+      if (!mongoUri) {
+        throw new Error('MONGODB_URI environment variable is not set');
+      }
+      
+      await mongoose.connect(mongoUri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+      
       console.log('Successfully connected to MongoDB');
       return;
     } catch (err) {
-      currentRetry++;
+      currentRetry += 1;
       console.error(
         `MongoDB connection attempt ${currentRetry} failed:`,
         err.message
       );
+      
       if (currentRetry === maxRetries) {
         console.error('Max retries reached. Could not connect to MongoDB');
-        process.exit(1);
+        throw err; // 让错误继续传播，而不是直接退出进程
       }
+      
       console.log(`Retrying in ${retryInterval / 1000} seconds...`);
       await new Promise((resolve) => setTimeout(resolve, retryInterval));
     }
@@ -117,7 +122,8 @@ const connectWithRetry = async () => {
 // Initialize MongoDB connection
 connectWithRetry().catch((err) => {
   console.error('Failed to establish initial connection to MongoDB:', err);
-  process.exit(1);
+  // 不要立即退出进程，让应用继续运行，这样至少可以返回错误信息
+  // process.exit(1);
 });
 
 // Error handling middleware
