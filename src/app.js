@@ -79,12 +79,13 @@ app.get('/', (req, res) => {
   });
 });
 
-// 添加测试路由
+// 添加基础测试路由
+app.get('/test', (req, res) => {
+  res.json({ message: 'Root test endpoint is working!' });
+});
+
 app.get('/api/test', (req, res) => {
-  res.json({
-    message: 'API test endpoint is working!',
-    timestamp: new Date().toISOString(),
-  });
+  res.json({ message: 'API test endpoint is working!' });
 });
 
 // 添加认证测试路由
@@ -107,14 +108,31 @@ app.use('/api/cities', cityRoutes);
 
 // 添加路由测试端点
 app.get('/api/routes-test', (req, res) => {
+  const routes = app._router.stack
+    .filter(r => r.route || (r.name === 'router' && r.handle.stack))
+    .map(r => {
+      if (r.route) {
+        return {
+          path: r.route.path,
+          methods: Object.keys(r.route.methods)
+        };
+      }
+      return {
+        name: r.name,
+        regexp: r.regexp.toString(),
+        path: r.regexp.toString().replace('/^\\', '').replace('\\/?(?=\\/|$)/i', '')
+      };
+    });
+
   res.json({
     message: 'Routes test',
+    routes: routes,
     registeredRoutes: {
-      auth: app._router.stack.some(r => r.regexp.test('/api/auth')),
-      users: app._router.stack.some(r => r.regexp.test('/api/users')),
-      routes: app._router.stack.some(r => r.regexp.test('/api/routes')),
-      bookings: app._router.stack.some(r => r.regexp.test('/api/bookings')),
-      cities: app._router.stack.some(r => r.regexp.test('/api/cities'))
+      auth: app._router.stack.some(r => r.regexp && r.regexp.test('/api/auth')),
+      users: app._router.stack.some(r => r.regexp && r.regexp.test('/api/users')),
+      routes: app._router.stack.some(r => r.regexp && r.regexp.test('/api/routes')),
+      bookings: app._router.stack.some(r => r.regexp && r.regexp.test('/api/bookings')),
+      cities: app._router.stack.some(r => r.regexp && r.regexp.test('/api/cities'))
     }
   });
 });
