@@ -252,13 +252,67 @@ exports.updateCurrentUser = async (req, res) => {
       }
       
       // 更新首选巴士类型
-      if (Array.isArray(preferences.preferredBusTypes)) {
-        user.preferences.preferredBusTypes = preferences.preferredBusTypes;
+      if (preferences.preferredBusTypes) {
+        // 如果是数组，直接替换
+        if (Array.isArray(preferences.preferredBusTypes)) {
+          user.preferences.preferredBusTypes = preferences.preferredBusTypes;
+        }
+        // 如果是对象，处理数组操作
+        else if (typeof preferences.preferredBusTypes === 'object') {
+          user.preferences.preferredBusTypes = user.preferences.preferredBusTypes || [];
+          if (preferences.preferredBusTypes.add) {
+            // 添加新元素，避免重复
+            const newItems = Array.isArray(preferences.preferredBusTypes.add) 
+              ? preferences.preferredBusTypes.add 
+              : [preferences.preferredBusTypes.add];
+            newItems.forEach(item => {
+              if (!user.preferences.preferredBusTypes.includes(item)) {
+                user.preferences.preferredBusTypes.push(item);
+              }
+            });
+          }
+          if (preferences.preferredBusTypes.remove) {
+            // 移除指定元素
+            const removeItems = Array.isArray(preferences.preferredBusTypes.remove)
+              ? preferences.preferredBusTypes.remove
+              : [preferences.preferredBusTypes.remove];
+            user.preferences.preferredBusTypes = user.preferences.preferredBusTypes.filter(
+              item => !removeItems.includes(item)
+            );
+          }
+        }
       }
       
       // 更新首选出发时间
-      if (Array.isArray(preferences.preferredDepartureTime)) {
-        user.preferences.preferredDepartureTime = preferences.preferredDepartureTime;
+      if (preferences.preferredDepartureTime) {
+        // 如果是数组，直接替换
+        if (Array.isArray(preferences.preferredDepartureTime)) {
+          user.preferences.preferredDepartureTime = preferences.preferredDepartureTime;
+        }
+        // 如果是对象，处理数组操作
+        else if (typeof preferences.preferredDepartureTime === 'object') {
+          user.preferences.preferredDepartureTime = user.preferences.preferredDepartureTime || [];
+          if (preferences.preferredDepartureTime.add) {
+            // 添加新元素，避免重复
+            const newItems = Array.isArray(preferences.preferredDepartureTime.add)
+              ? preferences.preferredDepartureTime.add
+              : [preferences.preferredDepartureTime.add];
+            newItems.forEach(item => {
+              if (!user.preferences.preferredDepartureTime.includes(item)) {
+                user.preferences.preferredDepartureTime.push(item);
+              }
+            });
+          }
+          if (preferences.preferredDepartureTime.remove) {
+            // 移除指定元素
+            const removeItems = Array.isArray(preferences.preferredDepartureTime.remove)
+              ? preferences.preferredDepartureTime.remove
+              : [preferences.preferredDepartureTime.remove];
+            user.preferences.preferredDepartureTime = user.preferences.preferredDepartureTime.filter(
+              item => !removeItems.includes(item)
+            );
+          }
+        }
       }
     }
 
