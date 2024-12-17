@@ -62,6 +62,21 @@ app.use((req, res, next) => {
   next();
 });
 
+// 添加根路由处理
+app.get('/', (req, res) => {
+  res.json({
+    message: 'BBbus API is running',
+    environment: process.env.NODE_ENV,
+    routes: {
+      auth: '/api/auth',
+      users: '/api/users',
+      routes: '/api/routes',
+      bookings: '/api/bookings',
+      cities: '/api/cities',
+    },
+  });
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -71,7 +86,10 @@ app.use('/api/cities', cityRoutes);
 
 // 添加测试路由
 app.get('/api/test', (req, res) => {
-  res.json({ message: 'API is working!' });
+  res.json({
+    message: 'API test endpoint is working!',
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // 404处理
@@ -93,12 +111,12 @@ const connectWithRetry = async () => {
       if (!mongoUri) {
         throw new Error('MONGODB_URI environment variable is not set');
       }
-      
+
       await mongoose.connect(mongoUri, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       });
-      
+
       console.log('Successfully connected to MongoDB');
       return;
     } catch (err) {
@@ -107,12 +125,12 @@ const connectWithRetry = async () => {
         `MongoDB connection attempt ${currentRetry} failed:`,
         err.message
       );
-      
+
       if (currentRetry === maxRetries) {
         console.error('Max retries reached. Could not connect to MongoDB');
         throw err; // 让错误继续传播，而不是直接退出进程
       }
-      
+
       console.log(`Retrying in ${retryInterval / 1000} seconds...`);
       await new Promise((resolve) => setTimeout(resolve, retryInterval));
     }
