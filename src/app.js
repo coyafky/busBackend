@@ -121,8 +121,28 @@ app.get('/api/routes-test', (req, res) => {
 
 // 404处理
 app.use((req, res, next) => {
+  console.log('404 Not Found:', {
+    method: req.method,
+    path: req.path,
+    body: req.body,
+    headers: req.headers
+  });
   res.status(404).json({
     message: '接口不存在',
+    requestedPath: req.path,
+    method: req.method
+  });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  console.error('Stack:', err.stack);
+  res.status(500).json({
+    message: '服务器内部错误',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined,
+    path: req.path,
+    method: req.method
   });
 });
 
@@ -169,15 +189,6 @@ connectWithRetry().catch((err) => {
   console.error('Failed to establish initial connection to MongoDB:', err);
   // 不要立即退出进程，让应用继续运行，这样至少可以返回错误信息
   // process.exit(1);
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  res.status(500).json({
-    message: '服务器内部错误',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined,
-  });
 });
 
 const PORT = process.env.PORT || 3000;
