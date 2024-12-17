@@ -35,7 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // 请求体解析
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.text());
 app.use(express.raw());
 
@@ -59,6 +59,8 @@ app.use((req, res, next) => {
 // 添加请求日志中间件
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`);
+  console.log('Request Headers:', req.headers);
+  console.log('Request Body:', req.body);
   next();
 });
 
@@ -93,12 +95,29 @@ app.get('/api/auth/test', (req, res) => {
   });
 });
 
+// 路由注册前添加调试信息
+console.log('Registering routes...');
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/routes', routeRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/cities', cityRoutes);
+
+// 添加路由测试端点
+app.get('/api/routes-test', (req, res) => {
+  res.json({
+    message: 'Routes test',
+    registeredRoutes: {
+      auth: app._router.stack.some(r => r.regexp.test('/api/auth')),
+      users: app._router.stack.some(r => r.regexp.test('/api/users')),
+      routes: app._router.stack.some(r => r.regexp.test('/api/routes')),
+      bookings: app._router.stack.some(r => r.regexp.test('/api/bookings')),
+      cities: app._router.stack.some(r => r.regexp.test('/api/cities'))
+    }
+  });
+});
 
 // 404处理
 app.use((req, res, next) => {
