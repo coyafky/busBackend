@@ -69,6 +69,11 @@ app.use('/api/routes', routeRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/cities', cityRoutes);
 
+// 添加测试路由
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API is working!' });
+});
+
 // 404处理
 app.use((req, res, next) => {
   res.status(404).json({
