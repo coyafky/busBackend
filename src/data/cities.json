@@ -1,0 +1,122 @@
+{
+  "cities": [
+    {
+      "name": "北京",
+      "code": "BJ",
+      "province": "北京市",
+      "stations": [
+        {
+          "name": "北京南站",
+          "address": "北京市丰台区永外大街车站路12号",
+          "coordinates": {
+            "latitude": 39.865,
+            "longitude": 116.378
+          },
+          "type": "railway",
+          "active": true
+        },
+        {
+          "name": "北京西站",
+          "address": "北京市丰台区莲花池东路118号",
+          "coordinates": {
+            "latitude": 39.894,
+            "longitude": 116.322
+          },
+          "type": "railway",
+          "active": true
+        },
+        {
+          "name": "六里桥长途汽车站",
+          "address": "北京市丰台区六里桥北里甲1号",
+          "coordinates": {
+            "latitude": 39.889,
+            "longitude": 116.309
+          },
+          "type": "bus",
+          "active": true
+        }
+      ]
+    },
+    {
+      "name": "上海",
+      "code": "SH",
+      "province": "上海市",
+      "stations": [
+        {
+          "name": "上海南站",
+          "address": "上海市徐汇区沪闵路303号",
+          "coordinates": {
+            "latitude": 31.154,
+            "longitude": 121.430
+          },
+          "type": "railway",
+          "active": true
+        },
+        {
+          "name": "上海长途汽车客运总站",
+          "address": "上海市闵行区沪闵路666号",
+          "coordinates": {
+            "latitude": 31.152,
+            "longitude": 121.425
+          },
+          "type": "bus",
+          "active": true
+        }
+      ]
+    },
+    {
+      "name": "广州",
+      "code": "GZ",
+      "province": "广东省",
+      "stations": [
+        {
+          "name": "广州南站",
+          "address": "广州市番禺区石壁街广州南站路1号",
+          "coordinates": {
+            "latitude": 22.987,
+            "longitude": 113.269
+          },
+          "type": "railway",
+          "active": true
+        },
+        {
+          "name": "广州汽车客运站",
+          "address": "广州市天河区临江大道1号",
+          "coordinates": {
+            "latitude": 23.125,
+            "longitude": 113.327
+          },
+          "type": "bus",
+          "active": true
+        }
+      ]
+    },
+    {
+      "name": "深圳",
+      "code": "SZ",
+      "province": "广东省",
+      "stations": [
+        {
+          "name": "深圳北站",
+          "address": "深圳市龙华区民治街道布龙路1号",
+          "coordinates": {
+            "latitude": 22.609,
+            "longitude": 114.029
+          },
+          "type": "railway",
+          "active": true
+        },
+        {
+          "name": "深圳汽车站",
+          "address": "深圳市罗湖区建设路2号",
+          "coordinates": {
+            "latitude": 22.545,
+            "longitude": 114.117
+          },
+          "type": "bus",
+          "active": true
+        }
+      ]
+    }
+  ]
+}

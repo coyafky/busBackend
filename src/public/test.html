@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API 测试页面</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      input {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+      }
+      button {
+        padding: 10px 15px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      .response {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        background-color: #f9f9f9;
+        white-space: pre-wrap;
+      }
+      .tab {
+        display: none;
+      }
+      .tab.active {
+        display: block;
+      }
+      .tab-buttons {
+        margin-bottom: 20px;
+      }
+      .tab-button {
+        padding: 10px 20px;
+        margin-right: 10px;
+        background-color: #ddd;
+        border: none;
+        cursor: pointer;
+      }
+      .tab-button.active {
+        background-color: #4caf50;
+        color: white;
+      }
+      .passenger {
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .passenger input {
+        width: calc(33% - 10px);
+        margin-right: 10px;
+      }
+      select {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>BBbus API 测试页面</h1>
+
+    <div class="tab-buttons">
+      <button class="tab-button active" onclick="showTab('register')">
+        注册
+      </button>
+      <button class="tab-button" onclick="showTab('login')">登录</button>
+      <button class="tab-button" onclick="showTab('profile')">更新资料</button>
+      <button class="tab-button" onclick="showTab('booking')">预订车票</button>
+    </div>
+
+    <!-- 注册表单 -->
+    <div id="register" class="tab active">
+      <h2>用户注册</h2>
+      <form id="registerForm">
+        <div class="form-group">
+          <label for="reg-username">用户名：</label>
+          <input type="text" id="reg-username" name="username" required />
+        </div>
+        <div class="form-group">
+          <label for="reg-password">密码：</label>
+          <input type="password" id="reg-password" name="password" required />
+        </div>
+        <button type="submit">注册</button>
+      </form>
+      <div id="registerResponse" class="response"></div>
+    </div>
+
+    <!-- 登录表单 -->
+    <div id="login" class="tab">
+      <h2>用户登录</h2>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="login-username">用户名：</label>
+          <input type="text" id="login-username" name="username" required />
+        </div>
+        <div class="form-group">
+          <label for="login-password">密码：</label>
+          <input type="password" id="login-password" name="password" required />
+        </div>
+        <button type="submit">登录</button>
+      </form>
+      <div id="loginResponse" class="response"></div>
+    </div>
+
+    <!-- 更新资料表单 -->
+    <div id="profile" class="tab">
+      <h2>更新个人资料</h2>
+      <form id="profileForm">
+        <div class="form-group">
+          <label for="profile-email">邮箱：</label>
+          <input type="email" id="profile-email" name="email" />
+        </div>
+        <div class="form-group">
+          <label for="profile-phone">手机号：</label>
+          <input type="tel" id="profile-phone" name="phoneNumber" />
+        </div>
+        <div class="form-group">
+          <label for="profile-nickname">昵称：</label>
+          <input type="text" id="profile-nickname" name="nickname" />
+        </div>
+        <button type="submit">更新资料</button>
+      </form>
+      <div id="profileResponse" class="response"></div>
+    </div>
+
+    <!-- 预订表单 -->
+    <div id="booking" class="tab">
+      <h2>预订车票</h2>
+      <form id="bookingForm">
+        <div class="form-group">
+          <label for="booking-start">出发城市：</label>
+          <select
+            id="booking-start"
+            name="start"
+            required
+            onchange="handleCityChange()"
+          >
+            <option value="">请选择出发城市</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="booking-end">到达城市：</label>
+          <select
+            id="booking-end"
+            name="end"
+            required
+            onchange="handleCityChange()"
+          >
+            <option value="">请选择到达城市</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="booking-routeId">路线：</label>
+          <select
+            id="booking-routeId"
+            name="routeId"
+            required
+            onchange="handleRouteChange()"
+          >
+            <option value="">请先选择城市</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="booking-departurePoint">出发站点：</label>
+          <select id="booking-departurePoint" name="departurePoint" required>
+            <option value="">请先选择路线</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="booking-departureTime">出发时间：</label>
+          <select id="booking-departureTime" name="departureTime" required>
+            <option value="">请先选择出发站点</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="booking-arrivalPoint">到达站点：</label>
+          <select id="booking-arrivalPoint" name="arrivalPoint" required>
+            <option value="">请先选择路线</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="booking-scheduleDate">出发日期：</label>
+          <input
+            type="date"
+            id="booking-scheduleDate"
+            name="scheduleDate"
+            required
+            onchange="handleDateChange()"
+          />
+        </div>
+        <div class="form-group">
+          <label>乘客信息：</label>
+          <div id="passengers-container">
+            <div class="passenger">
+              <input
+                type="text"
+                name="passengerName[]"
+                placeholder="姓名"
+                required
+              />
+              <input
+                type="text"
+                name="passengerIdNumber[]"
+                placeholder="身份证号"
+                required
+              />
+              <input
+                type="tel"
+                name="passengerPhone[]"
+                placeholder="手机号"
+                required
+              />
+              <button type="button" onclick="removePassenger(this)">
+                删除
+              </button>
+            </div>
+          </div>
+          <button type="button" onclick="addPassenger()">添加乘客</button>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" name="insurance" /> 购买保险 (20元/人)
+          </label>
+        </div>
+        <button type="submit">提交订单</button>
+      </form>
+      <div id="bookingResponse" class="response"></div>
+    </div>
+
+    <script>
+      // 保存 token
+      let authToken = '';
+
+      // 切换标签页
+      function showTab(tabId) {
+        document
+          .querySelectorAll('.tab')
+          .forEach((tab) => tab.classList.remove('active'));
+        document
+          .querySelectorAll('.tab-button')
+          .forEach((btn) => btn.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        document
+          .querySelector(`button[onclick="showTab('${tabId}')"]`)
+          .classList.add('active');
+      }
+
+      // 注册表单提交
+      document
+        .getElementById('registerForm')
+        .addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          try {
+            const response = await fetch('/api/auth/register', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams(formData),
+            });
+            const data = await response.json();
+            document.getElementById('registerResponse').textContent =
+              JSON.stringify(data, null, 2);
+            if (data.data?.token) {
+              authToken = data.data.token;
+            }
+          } catch (error) {
+            document.getElementById('registerResponse').textContent =
+              '请求失败：' + error.message;
+          }
+        });
+
+      // 登录表单提交
+      document
+        .getElementById('loginForm')
+        .addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          try {
+            const response = await fetch('/api/auth/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams(formData),
+            });
+            const data = await response.json();
+            document.getElementById('loginResponse').textContent =
+              JSON.stringify(data, null, 2);
+            if (data.data?.token) {
+              authToken = data.data.token;
+            }
+          } catch (error) {
+            document.getElementById('loginResponse').textContent =
+              '请求失败：' + error.message;
+          }
+        });
+
+      // 更新资料表单提交
+      document
+        .getElementById('profileForm')
+        .addEventListener('submit', async (e) => {
+          e.preventDefault();
+          if (!authToken) {
+            document.getElementById('profileResponse').textContent =
+              '请先登录获取 token';
+            return;
+          }
+          const formData = new FormData(e.target);
+          try {
+            const response = await fetch('/api/auth/profile', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                Authorization: `Bearer ${authToken}`,
+              },
+              body: new URLSearchParams(formData),
+            });
+            const data = await response.json();
+            document.getElementById('profileResponse').textContent =
+              JSON.stringify(data, null, 2);
+          } catch (error) {
+            document.getElementById('profileResponse').textContent =
+              '请求失败：' + error.message;
+          }
+        });
+
+      // 添加乘客
+      function addPassenger() {
+        const container = document.getElementById('passengers-container');
+        const div = document.createElement('div');
+        div.className = 'passenger';
+        div.innerHTML = `
+          <input type="text" name="passengerName[]" placeholder="姓名" required />
+          <input type="text" name="passengerIdNumber[]" placeholder="身份证号" required />
+          <input type="tel" name="passengerPhone[]" placeholder="手机号" required />
+          <button type="button" onclick="removePassenger(this)">删除</button>
+        `;
+        container.appendChild(div);
+      }
+
+      // 删除乘客
+      function removePassenger(button) {
+        button.parentElement.remove();
+      }
+
+      // 预订表单提交
+      document
+        .getElementById('bookingForm')
+        .addEventListener('submit', async (e) => {
+          e.preventDefault();
+          if (!authToken) {
+            alert('请先登录');
+            return;
+          }
+
+          const formData = new FormData(e.target);
+          const passengers = [];
+          const names = formData.getAll('passengerName[]');
+          const idNumbers = formData.getAll('passengerIdNumber[]');
+          const phones = formData.getAll('passengerPhone[]');
+
+          for (let i = 0; i < names.length; i++) {
+            passengers.push({
+              name: names[i],
+              idNumber: idNumbers[i],
+              phone: phones[i],
+              type: 'adult',
+            });
+          }
+
+          const bookingData = {
+            routeId: formData.get('routeId'),
+            departurePoint: formData.get('departurePoint'),
+            departureTime: formData.get('departureTime'),
+            arrivalPoint: formData.get('arrivalPoint'),
+            scheduleDate: formData.get('scheduleDate'),
+            passengers: passengers,
+            insurance: formData.get('insurance') === 'on',
+          };
+
+          try {
+            const response = await fetch('/api/bookings', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${authToken}`,
+              },
+              body: JSON.stringify(bookingData),
+            });
+            const data = await response.json();
+            document.getElementById('bookingResponse').textContent =
+              JSON.stringify(data, null, 2);
+          } catch (error) {
+            document.getElementById('bookingResponse').textContent =
+              '请求失败：' + error.message;
+          }
+        });
+
+      // 获取所有城市
+      async function loadCities() {
+        try {
+          const response = await fetch('/api/routes/cities');
+          const cities = await response.json();
+          const startSelect = document.getElementById('booking-start');
+          const endSelect = document.getElementById('booking-end');
+
+          cities.forEach((city) => {
+            const option = document.createElement('option');
+            option.value = city;
+            option.textContent = city;
+            startSelect.appendChild(option.cloneNode(true));
+            endSelect.appendChild(option);
+          });
+        } catch (error) {
+          console.error('加载城市失败:', error);
+        }
+      }
+
+      // 当城市选择改变时
+      async function handleCityChange() {
+        const start = document.getElementById('booking-start').value;
+        const end = document.getElementById('booking-end').value;
+        const date = document.getElementById('booking-scheduleDate').value;
+
+        if (start && end && date) {
+          await searchRoutes(start, end, date);
+        }
+      }
+
+      // 搜索路线
+      async function searchRoutes(start, end, date) {
+        try {
+          const response = await fetch(
+            `/api/routes/search?start=${start}&end=${end}&date=${date}`
+          );
+          const data = await response.json();
+
+          const routeSelect = document.getElementById('booking-routeId');
+          routeSelect.innerHTML = '<option value="">请选择路线</option>';
+
+          if (data.routeId) {
+            const option = document.createElement('option');
+            option.value = data.routeId;
+            option.textContent = `${data.start} → ${data.end} (${data.duration}分钟)`;
+            routeSelect.appendChild(option);
+          }
+
+          // 更新站点选择
+          updateStations(data);
+        } catch (error) {
+          console.error('搜索路线失败:', error);
+        }
+      }
+
+      // 更新站点信息
+      function updateStations(routeData) {
+        const departureSelect = document.getElementById(
+          'booking-departurePoint'
+        );
+        const arrivalSelect = document.getElementById('booking-arrivalPoint');
+        const timeSelect = document.getElementById('booking-departureTime');
+
+        departureSelect.innerHTML = '<option value="">请选择出发站点</option>';
+        arrivalSelect.innerHTML = '<option value="">请选择到达站点</option>';
+        timeSelect.innerHTML = '<option value="">请选择出发时间</option>';
+
+        if (routeData.schedules && routeData.schedules.length > 0) {
+          const schedule = routeData.schedules[0];
+
+          // 添加出发站点
+          schedule.departurePoints.forEach((point) => {
+            const option = document.createElement('option');
+            option.value = point.name;
+            option.textContent = point.name;
+            departureSelect.appendChild(option);
+          });
+
+          // 添加到达站点
+          schedule.arrivalPoints.forEach((point) => {
+            const option = document.createElement('option');
+            option.value = point;
+            option.textContent = point;
+            arrivalSelect.appendChild(option);
+          });
+        }
+      }
+
+      // 当出发站点改变时
+      function handleDeparturePointChange() {
+        const departurePoint = document.getElementById(
+          'booking-departurePoint'
+        ).value;
+        const routeId = document.getElementById('booking-routeId').value;
+        const date = document.getElementById('booking-scheduleDate').value;
+
+        if (departurePoint && routeId && date) {
+          updateDepartureTimes(departurePoint);
+        }
+      }
+
+      // 更新出发时间选项
+      function updateDepartureTimes(departurePoint) {
+        const timeSelect = document.getElementById('booking-departureTime');
+        timeSelect.innerHTML = '<option value="">请选择出发时间</option>';
+
+        // 这里应该根据实际的时刻表数据来设置时间选项
+        const times = ['08:00', '10:00', '12:00', '14:00', '16:00'];
+        times.forEach((time) => {
+          const option = document.createElement('option');
+          option.value = time;
+          option.textContent = time;
+          timeSelect.appendChild(option);
+        });
+      }
+
+      // 当日期改变时
+      function handleDateChange() {
+        handleCityChange();
+      }
+
+      // 页面加载时获取城市列表
+      document.addEventListener('DOMContentLoaded', () => {
+        loadCities();
+
+        // 设置日期选择器的最小值为今天
+        const dateInput = document.getElementById('booking-scheduleDate');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.min = today;
+        dateInput.value = today;
+
+        // 添加出发站点变化的监听器
+        document
+          .getElementById('booking-departurePoint')
+          .addEventListener('change', handleDeparturePointChange);
+      });
+    </script>
+  </body>
+</html>
