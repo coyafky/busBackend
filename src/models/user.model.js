@@ -51,17 +51,41 @@ const userSchema = new mongoose.Schema({
       type: String,
       default: 'Asia/Shanghai',
     },
-    preferredBusTypes: [String],
-    preferredDepartureTime: [String],
+    preferredBusTypes: {
+      type: [String],
+      required: false,
+    },
+    preferredDepartureTime: {
+      type: [String],
+      required: false,
+    },
     priceRange: {
-      min: Number,
-      max: Number,
+      min: {
+        type: Number,
+        required: false,
+      },
+      max: {
+        type: Number,
+        required: false,
+      },
     },
     preferredFeatures: {
-      wifi: Boolean,
-      toilet: Boolean,
-      usbCharger: Boolean,
-      airConditioner: Boolean,
+      wifi: {
+        type: Boolean,
+        required: false,
+      },
+      toilet: {
+        type: Boolean,
+        required: false,
+      },
+      usbCharger: {
+        type: Boolean,
+        required: false,
+      },
+      airConditioner: {
+        type: Boolean,
+        required: false,
+      },
     },
   },
   status: {

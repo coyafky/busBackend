@@ -65,7 +65,9 @@ exports.register = async (req, res) => {
     });
   } catch (error) {
     console.error('注册错误:', error);
-    res.status(500).json({ message: '注册过程中发生错误', error: error.message });
+    res
+      .status(500)
+      .json({ message: '注册过程中发生错误', error: error.message });
   }
 };
 
@@ -121,7 +123,9 @@ exports.login = async (req, res) => {
     });
   } catch (error) {
     console.error('登录错误:', error);
-    res.status(500).json({ message: '登录过程中发生错误', error: error.message });
+    res
+      .status(500)
+      .json({ message: '登录过程中发生错误', error: error.message });
   }
 };
 
@@ -150,10 +154,10 @@ exports.getCurrentUser = async (req, res) => {
     });
   } catch (error) {
     console.error('获取用户信息错误:', error);
-    res.status(500).json({ 
-      message: '获取用户信息时发生错误', 
+    res.status(500).json({
+      message: '获取用户信息时发生错误',
       error: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     });
   }
 };
@@ -163,9 +167,9 @@ exports.updateCurrentUser = async (req, res) => {
   try {
     console.log('Update current user request:', {
       userId: req.user._id,
-      body: req.body
+      body: req.body,
     });
-    
+
     const { email, phoneNumber, profile, preferences } = req.body;
     const userId = req.user._id;
 
@@ -229,10 +233,10 @@ exports.updateCurrentUser = async (req, res) => {
     });
   } catch (error) {
     console.error('更新用户信息错误:', error);
-    res.status(500).json({ 
-      message: '更新用户信息时发生错误', 
+    res.status(500).json({
+      message: '更新用户信息时发生错误',
       error: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     });
   }
 };
