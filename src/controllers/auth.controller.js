@@ -15,6 +15,7 @@ function generateUserId() {
 // 注册新用户
 exports.register = async (req, res) => {
   try {
+    console.log('Register request body:', req.body);
     const { username, password } = req.body;
 
     // 参数验证
@@ -64,13 +65,14 @@ exports.register = async (req, res) => {
     });
   } catch (error) {
     console.error('注册错误:', error);
-    res.status(500).json({ message: '注册过程中发生错误' });
+    res.status(500).json({ message: '注册过程中发生错误', error: error.message });
   }
 };
 
 // 用户登录
 exports.login = async (req, res) => {
   try {
+    console.log('Login request body:', req.body);
     const { username, password } = req.body;
 
     // 参数验证
@@ -88,11 +90,6 @@ exports.login = async (req, res) => {
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       return res.status(401).json({ message: '用户名或密码错误' });
-    }
-
-    // 检查用户状态
-    if (user.status !== 'active') {
-      return res.status(403).json({ message: '账号已被禁用' });
     }
 
     // 生成 token
@@ -124,13 +121,14 @@ exports.login = async (req, res) => {
     });
   } catch (error) {
     console.error('登录错误:', error);
-    res.status(500).json({ message: '登录过程中发生错误' });
+    res.status(500).json({ message: '登录过程中发生错误', error: error.message });
   }
 };
 
 // 获取当前用户信息
 exports.getCurrentUser = async (req, res) => {
   try {
+    console.log('Get current user request:', { userId: req.user._id });
     const user = await User.findById(req.user._id).select('-password');
     if (!user) {
       return res.status(404).json({ message: '用户不存在' });
@@ -152,13 +150,22 @@ exports.getCurrentUser = async (req, res) => {
     });
   } catch (error) {
     console.error('获取用户信息错误:', error);
-    res.status(500).json({ message: '获取用户信息时发生错误' });
+    res.status(500).json({ 
+      message: '获取用户信息时发生错误', 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 
 // 更新当前用户信息
 exports.updateCurrentUser = async (req, res) => {
   try {
+    console.log('Update current user request:', {
+      userId: req.user._id,
+      body: req.body
+    });
+    
     const { email, phoneNumber, profile, preferences } = req.body;
     const userId = req.user._id;
 
@@ -222,7 +229,11 @@ exports.updateCurrentUser = async (req, res) => {
     });
   } catch (error) {
     console.error('更新用户信息错误:', error);
-    res.status(500).json({ message: '更新用户信息时发生错误' });
+    res.status(500).json({ 
+      message: '更新用户信息时发生错误', 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 
